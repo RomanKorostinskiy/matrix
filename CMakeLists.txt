@@ -7,5 +7,5 @@ include_directories(include)
 
 add_executable(matrix
         include/matrix.h
-        src/main.cpp
-        src/matrix.cpp)
+        include/row.h
+        src/main.cpp)
