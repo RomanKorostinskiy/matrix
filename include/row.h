@@ -15,7 +15,7 @@ template<typename T> class Row {
       data_[i] = val;
     }
   }
-  Row(const Row &rhs): cols_(rhs.cols_) { //TODO: test this
+  Row(const Row &rhs): cols_(rhs.cols_) {
     data_ = new T[cols_];
     std::memcpy(data_, rhs.data_, cols_ * sizeof(T));
   }
@@ -23,11 +23,13 @@ template<typename T> class Row {
     rhs.data_ = nullptr;
   }
 
-  Row& operator=(const Row &rhs) { //TODO: test this
+  Row& operator=(const Row &rhs) {
     if (this == &rhs)
       return *this;
 
-    data_ = new T[rhs.cols_];
+    cols_ = rhs.cols_;
+    delete[] data_;
+    data_ = new T[cols_];
     std::memcpy(data_, rhs.data_, rhs.cols_ * sizeof(T));
     return *this;
   }
@@ -35,10 +37,25 @@ template<typename T> class Row {
     if (this == &rhs)
       return *this;
 
-    delete data_;
+    cols_ = rhs.cols_;
+    delete[] data_;
     data_ = rhs.data_;
     rhs.data_ = nullptr;
     return *this;
+  }
+
+  bool operator==(Row const& rhs) const {
+    if (cols_ != rhs.cols_) {
+      return false;
+    }
+    for (int i = 0; i < cols_; i++)
+      if (data_[i] != rhs.data_[i])
+        return false;
+
+    return true;
+  }
+  bool operator!=(Row const& rhs) const {
+    return !(*this == rhs);
   }
 
   ~Row() {
@@ -49,10 +66,10 @@ template<typename T> class Row {
   const T& operator[](int n) const {return data_[n];}
 
   void Print() const {
-    std::cout << "Row " << cols_ << ":\n\n";
+    std::cout << "Row " << cols_ << ":" << std::endl;
     for (int i = 0; i < cols_; i++) {
       std::cout << data_[i] << " ";
     }
-    std::cout << std::endl;
+    std::cout << std::endl << std::endl;
   }
 };
