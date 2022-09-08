@@ -3,7 +3,7 @@
 
 using namespace testing;
 
-TEST(OperatorsTests, EqualsTest) {
+TEST(RowOperatorsTests, EqualsTest) {
   //Equal
   Row<int> row(5, 0);
   EXPECT_EQ(row, row);
@@ -33,7 +33,7 @@ TEST(OperatorsTests, SquareBracketsTest) {
   }
 }
 
-TEST(RAII_Tests, CopyConstructorTest) {
+TEST(RowRAII_Tests, CopyConstructorTest) {
   //Equal
   Row<int> row1(5, 0);
   Row<int> row2 = row1;
@@ -44,7 +44,7 @@ TEST(RAII_Tests, CopyConstructorTest) {
   Row<int> row4(row2);
   EXPECT_NE(row3, row4);
 }
-TEST(RAII_Tests, CopyAsignmentTest) {
+TEST(RowRAII_Tests, CopyAsignmentTest) {
   //Equal
   Row<int> row1(5, 0);
   Row<int> row2(5, 0);
@@ -63,7 +63,7 @@ TEST(RAII_Tests, CopyAsignmentTest) {
   row8 = row6;
   EXPECT_NE(row7, row8);
 }
-TEST(RAII_Tests, MoveConstructorTest) {
+TEST(RowRAII_Tests, MoveConstructorTest) {
   //Equal
   Row<int> row1 = Row<int>(5, 0);
   Row<int> row2(Row<int>(5, 0));
@@ -82,7 +82,7 @@ TEST(RAII_Tests, MoveConstructorTest) {
   Row<int> row8 = std::move(row6);
   EXPECT_NE(row7, row8);
 }
-TEST(RAII_Tests, MoveAsignmentTest) {
+TEST(RowRAII_Tests, MoveAsignmentTest) {
   //Equal
   Row<int> row1(5, 0);
   Row<int> row3;

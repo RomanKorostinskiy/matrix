@@ -19,7 +19,7 @@ template<typename T> class Row {
     data_ = new T[cols_];
     std::memcpy(data_, rhs.data_, cols_ * sizeof(T));
   }
-  Row(Row &&rhs) noexcept : data_(rhs.data_), cols_(rhs.cols_) { //TODO: test this
+  Row(Row &&rhs) noexcept : data_(rhs.data_), cols_(rhs.cols_) {
     rhs.data_ = nullptr;
   }
 
@@ -33,7 +33,7 @@ template<typename T> class Row {
     std::memcpy(data_, rhs.data_, rhs.cols_ * sizeof(T));
     return *this;
   }
-  Row& operator=(Row &&rhs) noexcept { //TODO: test this
+  Row& operator=(Row &&rhs) noexcept {
     if (this == &rhs)
       return *this;
 
@@ -44,6 +44,12 @@ template<typename T> class Row {
     return *this;
   }
 
+  ~Row() {
+    delete[] data_;
+  }
+
+  T& operator[](int n) {return data_[n];}
+  const T& operator[](int n) const {return data_[n];}
   bool operator==(Row const& rhs) const {
     if (cols_ != rhs.cols_) {
       return false;
@@ -57,13 +63,6 @@ template<typename T> class Row {
   bool operator!=(Row const& rhs) const {
     return !(*this == rhs);
   }
-
-  ~Row() {
-    delete[] data_;
-  }
-
-  T& operator[](int n) {return data_[n];}
-  const T& operator[](int n) const {return data_[n];}
 
   void Print() const {
     std::cout << "Row " << cols_ << ":" << std::endl;

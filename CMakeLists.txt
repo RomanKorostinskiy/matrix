@@ -20,7 +20,8 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 add_executable(matrix_test
-        test/row_test.cpp
+        test/row_class_test.cpp
+        test/matrix_class_test.cpp
 )
 target_link_libraries(matrix_test
         GTest::gtest_main
