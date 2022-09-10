@@ -1,7 +1,7 @@
 #pragma once
 
 #include <iostream>
-#include "row.h"
+#include "row.hpp"
 
 template<typename T> class Matrix {
   Row<T> *rows_ptr_;
