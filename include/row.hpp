@@ -3,50 +3,51 @@
 #include <iostream>
 #include <cstring>
 
-template<typename T> class Row {
-  T *data_;
+template<typename T> class RowBuf {
+ protected:
   int cols_;
+  T* data_;
+
+ protected:
+  explicit RowBuf(int cols = 0): cols_(cols),
+      data_((cols_ == 0) ? nullptr : new T[cols]) {}
+  RowBuf(const RowBuf &rhs) = delete;
+  RowBuf& operator=(const RowBuf &rhs) = delete;
+  RowBuf(RowBuf &&rhs) noexcept: cols_(rhs.cols_), data_(rhs.data_){
+    rhs.cols_ = 0;
+    rhs.data_ = nullptr;
+  }
+  RowBuf& operator=(RowBuf &&rhs) noexcept {
+    std::swap(cols_, rhs.cols_);
+    std::swap(data_, rhs.data_);
+    return *this;
+  }
+  ~RowBuf() {
+    delete[] data_;
+  }
+};
+
+template<typename T> class Row: private RowBuf<T> {
+  using RowBuf<T>::cols_;
+  using RowBuf<T>::data_;
 
  public:
-  Row(): cols_(0), data_(nullptr) {}
-  Row(int cols, T val = T{}):cols_(cols) {
-    data_ = new T[cols_];
-    for (int i = 0; i < cols_; i++) {
+  Row(int cols = 0, T val = T{}): RowBuf<T>(cols) {
+    for (int i = 0; i < cols_; i++)
       data_[i] = val;
-    }
   }
-  Row(const Row &rhs): cols_(rhs.cols_) {
-    data_ = new T[cols_];
-    std::memcpy(data_, rhs.data_, cols_ * sizeof(T));
+  Row(const Row &rhs): RowBuf<T>(rhs.cols_) {
+    for (int i = 0; i < cols_; i++)
+      data_[i] = rhs.data_[i];
   }
-  Row(Row &&rhs) noexcept : data_(rhs.data_), cols_(rhs.cols_) {
-    rhs.data_ = nullptr;
-  }
-
+  Row(Row &&rhs) = default;
   Row& operator=(const Row &rhs) {
-    if (this == &rhs)
-      return *this;
-
-    cols_ = rhs.cols_;
-    delete[] data_;
-    data_ = new T[cols_];
-    std::memcpy(data_, rhs.data_, rhs.cols_ * sizeof(T));
+    Row tmp(rhs);
+    std::swap(*this, tmp);
     return *this;
   }
-  Row& operator=(Row &&rhs) noexcept {
-    if (this == &rhs)
-      return *this;
-
-    cols_ = rhs.cols_;
-    delete[] data_;
-    data_ = rhs.data_;
-    rhs.data_ = nullptr;
-    return *this;
-  }
-
-  ~Row() {
-    delete[] data_;
-  }
+  Row& operator=(Row &&rhs) = default;
+  ~Row() = default;
 
   T& operator[](int n) {return data_[n];}
   const T& operator[](int n) const {return data_[n];}

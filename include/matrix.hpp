@@ -3,55 +3,56 @@
 #include <iostream>
 #include "row.hpp"
 
-template<typename T> class Matrix {
-  Row<T> *rows_ptr_;
+template<typename T> class MatrixBuf {
+ protected:
   int rows_, cols_;
+  Row<T>* rows_ptr_;
+
+ protected:
+  explicit MatrixBuf(int rows = 0, int cols = 0): rows_(rows), cols_(cols),
+      rows_ptr_((rows_ == 0) ? nullptr : new Row<T>[rows_]) {}
+  MatrixBuf(const MatrixBuf &rhs) = delete;
+  MatrixBuf& operator=(const MatrixBuf &rhs) = delete;
+  MatrixBuf(MatrixBuf &&rhs) noexcept: rows_(rhs.rows_), cols_(rhs.cols_),
+      rows_ptr_(rhs.rows_ptr_){
+    rhs.rows_ = 0;
+    rhs.cols_ = 0;
+    rhs.rows_ptr_ = nullptr;
+  }
+  MatrixBuf& operator=(MatrixBuf &&rhs) noexcept {
+    std::swap(rows_, rhs.rows_);
+    std::swap(cols_, rhs.cols_);
+    std::swap(rows_ptr_, rhs.rows_ptr_);
+    return *this;
+  }
+  ~MatrixBuf() {
+    delete[] rows_ptr_;
+  }
+};
+
+template<typename T> class Matrix: private MatrixBuf<T> {
+  using MatrixBuf<T>::rows_;
+  using MatrixBuf<T>::cols_;
+  using MatrixBuf<T>::rows_ptr_;
 
  public:
-  Matrix(): rows_(0), cols_(0), rows_ptr_(nullptr) {}
-  Matrix(int rows, int cols, T val = T{}): rows_(rows), cols_(cols) {
-    rows_ptr_ = new Row<T>[rows_];
+  Matrix(int rows = 0, int cols = 0, T val = T{}): MatrixBuf<T>(rows, cols) {
     for (int i = 0; i < rows_; i++) {
       rows_ptr_[i] = Row<T>(cols_, val);
     }
   }
-  Matrix(const Matrix &rhs): rows_(rhs.rows_), cols_(rhs.cols_) {
-    rows_ptr_ = new Row<T>[rows_];
+  Matrix(const Matrix &rhs): MatrixBuf<T>(rhs.rows_, rhs.cols_) {
     for (int i = 0; i < rows_; i++)
       rows_ptr_[i] = rhs.rows_ptr_[i];
   }
-  Matrix(Matrix &&rhs) noexcept: rows_ptr_(rhs.rows_ptr_), rows_(rhs.rows_),
-    cols_(rhs.cols_) {
-    rhs.rows_ptr_ = nullptr;
-  }
-
+  Matrix(Matrix &&rhs) = default;
   Matrix& operator=(const Matrix &rhs) {
-    if (this == &rhs)
-      return *this;
-
-    rows_ = rhs.rows_;
-    cols_ = rhs.cols_;
-    delete[] rows_ptr_;
-    rows_ptr_ = new Row<T>[rows_];
-    for (int i = 0; i < rows_; i++)
-      rows_ptr_[i] = rhs.rows_ptr_[i];
+    Matrix tmp(rhs);
+    std::swap(*this, tmp);
     return *this;
   }
-  Matrix& operator=(Matrix &&rhs) noexcept {
-    if (this == &rhs)
-      return *this;
-
-    rows_ = rhs.rows_;
-    cols_ = rhs.cols_;
-    delete[] rows_ptr_;
-    rows_ptr_ = rhs.rows_ptr_;
-    rhs.rows_ptr_ = nullptr;
-    return *this;
-  }
-
-  ~Matrix() {
-    delete[] rows_ptr_;
-  }
+  Matrix& operator=(Matrix &&rhs) = default;
+  ~Matrix() = default;
 
   Row<T>& operator[](int n) {return rows_ptr_[n];}
   const Row<T>& operator[](int n) const {return rows_ptr_[n];}
