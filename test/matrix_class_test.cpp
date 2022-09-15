@@ -102,3 +102,19 @@ TEST(MatrixRAII_Tests, MoveAsignmentTest) {
   m8 = Matrix<int> (5, 5, 1);
   EXPECT_NE(m7, m8);
 }
+TEST(MatrixRAII_Tests, SequenceCtorTest) {
+  int m = 5, n = 6;
+  std::vector<int> seq(m * n);
+  for (int i = 0; i < m * n; i++) {
+    seq[i] = i;
+  }
+
+  Matrix<int> matrix{m, n, seq.begin(), seq.end()};
+  for (int i = 0, a = 0; i < m; i++) {
+    for (int j = 0; j < n; j++) {
+      EXPECT_EQ(matrix[i][j], seq[a]);
+      a++;
+    }
+  }
+}
+

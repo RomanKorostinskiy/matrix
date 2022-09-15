@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <exception>
 #include "row.hpp"
 
 template<typename T> class MatrixBuf {
@@ -9,8 +10,12 @@ template<typename T> class MatrixBuf {
   Row<T>* rows_ptr_;
 
  protected:
-  explicit MatrixBuf(int rows = 0, int cols = 0): rows_(rows), cols_(cols),
-      rows_ptr_((rows_ == 0) ? nullptr : new Row<T>[rows_]) {}
+  explicit MatrixBuf(int rows = 0, int cols = 0, T val = T{}): rows_(rows),
+      cols_(cols), rows_ptr_((rows_ == 0) ? nullptr : new Row<T>[rows_]) {
+    for (int i = 0; i < rows_; i++) {
+      rows_ptr_[i] = Row<T>{cols_, val};
+    }
+  }
   MatrixBuf(const MatrixBuf &rhs) = delete;
   MatrixBuf& operator=(const MatrixBuf &rhs) = delete;
   MatrixBuf(MatrixBuf &&rhs) noexcept: rows_(rhs.rows_), cols_(rhs.cols_),
@@ -36,9 +41,16 @@ template<typename T> class Matrix: private MatrixBuf<T> {
   using MatrixBuf<T>::rows_ptr_;
 
  public:
-  Matrix(int rows = 0, int cols = 0, T val = T{}): MatrixBuf<T>(rows, cols) {
+  Matrix(int rows = 0, int cols = 0, T val = T{})
+      : MatrixBuf<T>(rows, cols, val) {}
+  template <typename It> Matrix(int rows, int cols, It start, It fin)
+      : MatrixBuf<T>(rows, cols) {
+    if (fin - start != rows_ * cols_)
+      throw std::range_error(
+          "error: wrong conversation from sequence to matrix");
     for (int i = 0; i < rows_; i++) {
-      rows_ptr_[i] = Row<T>(cols_, val);
+      for (int j = 0; j < cols_; j++, start++)
+        rows_ptr_[i][j] = *start;
     }
   }
   Matrix(const Matrix &rhs): MatrixBuf<T>(rhs.rows_, rhs.cols_) {
@@ -70,8 +82,8 @@ template<typename T> class Matrix: private MatrixBuf<T> {
     return !(*this == rhs);
   }
 
-  void Print() const {
-    std::cout << "Matrix " << rows_ << "x" << cols_ << ":\n\n";
+  void Dump() const {
+    std::cout << "Matrix " << rows_ << "x" << cols_ << ":" << std::endl;
     for (int i = 0; i < rows_; i++) {
       for (int j = 0; j < cols_; j++) {
         std::cout << rows_ptr_[i][j] << "  ";

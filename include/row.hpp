@@ -9,8 +9,11 @@ template<typename T> class RowBuf {
   T* data_;
 
  protected:
-  explicit RowBuf(int cols = 0): cols_(cols),
-      data_((cols_ == 0) ? nullptr : new T[cols]) {}
+  explicit RowBuf(int cols = 0, T val = T{}): cols_(cols),
+      data_((cols_ == 0) ? nullptr : new T[cols]) {
+    for (int i = 0; i < cols_; i++)
+      data_[i] = T{val};
+  }
   RowBuf(const RowBuf &rhs) = delete;
   RowBuf& operator=(const RowBuf &rhs) = delete;
   RowBuf(RowBuf &&rhs) noexcept: cols_(rhs.cols_), data_(rhs.data_){
@@ -32,10 +35,7 @@ template<typename T> class Row: private RowBuf<T> {
   using RowBuf<T>::data_;
 
  public:
-  Row(int cols = 0, T val = T{}): RowBuf<T>(cols) {
-    for (int i = 0; i < cols_; i++)
-      data_[i] = val;
-  }
+  Row(int cols = 0, T val = T{}): RowBuf<T>(cols, val) {}
   Row(const Row &rhs): RowBuf<T>(rhs.cols_) {
     for (int i = 0; i < cols_; i++)
       data_[i] = rhs.data_[i];
@@ -65,7 +65,7 @@ template<typename T> class Row: private RowBuf<T> {
     return !(*this == rhs);
   }
 
-  void Print() const {
+  void Dump() const {
     std::cout << "Row " << cols_ << ":" << std::endl;
     for (int i = 0; i < cols_; i++) {
       std::cout << data_[i] << " ";
