@@ -47,7 +47,7 @@ TEST(MatrixRAII_Tests, CopyConstructorTest) {
   Matrix<int> m4(m2);
   EXPECT_NE(m3, m4);
 }
-TEST(MatrixRAII_Tests, CopyAsignmentTest) {
+TEST(MatrixRAII_Tests, CopyAssignmentTest) {
   //Equal
   Matrix<int> m1(5, 5, 0);
   Matrix<int> m2(5, 5, 0);
@@ -118,3 +118,86 @@ TEST(MatrixRAII_Tests, SequenceCtorTest) {
   }
 }
 
+TEST(MatrixRAII_TemplateTest, CopyAssignmentTest) {
+  //Equal
+  std::shared_ptr<int> ip = std::make_shared<int>(0);
+  Matrix<std::shared_ptr<int>> m1(5, 5, ip);
+  Matrix<std::shared_ptr<int>> m2(5, 5, ip);
+  Matrix<std::shared_ptr<int>> m3;
+  Matrix<std::shared_ptr<int>> m4;
+  m3 = m1;
+  m4 = m2;
+  EXPECT_EQ(m3, m4);
+
+  //Not Equal
+  Matrix<std::shared_ptr<int>> m5(5, 5, std::make_shared<int>(0));
+  Matrix<std::shared_ptr<int>> m6(5, 5, std::make_shared<int>(0));
+  Matrix<std::shared_ptr<int>> m7(1, 1, std::make_shared<int>(0));
+  Matrix<std::shared_ptr<int>> m8(1, 1, std::make_shared<int>(0));
+  m7 = m5;
+  m8 = m6;
+  EXPECT_NE(m7, m8);
+}
+
+TEST(MatrixMethotsTests, DeleteRowTest) {
+  int m = 5, n = 6;
+  std::vector<int> seq(m * n);
+  for (int i = 0; i < m * n; i++) {
+    seq[i] = i;
+  }
+
+  Matrix<int> matrix{m, n, seq.begin(), seq.end()};
+  int deleted_row = 1;
+  int offset_row = 0;
+  matrix.DeleteRow(deleted_row);
+  for (int i = 0, a = 0; i < m - 1; i++) {
+    if (i == deleted_row)
+      offset_row = n;
+    for (int j = 0; j < n; j++) {
+      EXPECT_EQ(matrix[i][j], seq[a + offset_row]);
+      a++;
+    }
+  }
+}
+TEST(MatrixMethotsTests, DeleteColumnTest) {
+  int m = 5, n = 6;
+  std::vector<int> seq(m * n);
+  for (int i = 0; i < m * n; i++) {
+    seq[i] = i;
+  }
+
+  Matrix<int> matrix{m, n, seq.begin(), seq.end()};
+  int deleted_col = 3;
+  matrix.DeleteColumn(deleted_col);
+  for (int i = 0, a = 0; i < m; i++) {
+    for (int j = 0; j < n - 1; j++) {
+      if (j == deleted_col)
+        a++;
+      EXPECT_EQ(matrix[i][j], seq[a]);
+      a++;
+    }
+  }
+}
+TEST(MatrixMethotsTests, DeleteRowColumnTest) {
+  int m = 5, n = 6;
+  std::vector<int> seq(m * n);
+  for (int i = 0; i < m * n; i++) {
+    seq[i] = i;
+  }
+
+  Matrix<int> matrix{m, n, seq.begin(), seq.end()};
+  int deleted_row = 3;
+  int deleted_col = 4;
+  int offset_row = 0;
+  matrix.DeleteRowColumn(deleted_row, deleted_col);
+  for (int i = 0, a = 0; i < m - 1; i++) {
+    if (i == deleted_row)
+      offset_row = n;
+    for (int j = 0; j < n - 1; j++) {
+      if (j == deleted_col)
+        a++;
+      EXPECT_EQ(matrix[i][j], seq[a + offset_row]);
+      a++;
+    }
+  }
+}

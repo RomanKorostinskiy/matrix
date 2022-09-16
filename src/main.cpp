@@ -9,6 +9,7 @@ int main() {
 
   Matrix<int> m{N, N, seq.begin(), seq.end()};
   m.Dump();
+  std::cout << "det = " << m.RecursiveDet() << std::endl;
 
   return 0;
 }

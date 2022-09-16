@@ -44,7 +44,7 @@ TEST(RowRAII_Tests, CopyConstructorTest) {
   Row<int> row4(row2);
   EXPECT_NE(row3, row4);
 }
-TEST(RowRAII_Tests, CopyAsignmentTest) {
+TEST(RowRAII_Tests, CopyAssignmentTest) {
   //Equal
   Row<int> row1(5, 0);
   Row<int> row2(5, 0);
@@ -97,5 +97,26 @@ TEST(RowRAII_Tests, MoveAsignmentTest) {
   Row<int> row8(1, 1);
   row7 = std::move(row5);
   row8 = Row<int> (5, 1);
+  EXPECT_NE(row7, row8);
+}
+
+TEST(RowRAII_TemplateTest, CopyAssignmentTest) {
+  //Equal
+  std::shared_ptr<int> ip = std::make_shared<int>(0);
+  Row<std::shared_ptr<int>> row1(5, ip);
+  Row<std::shared_ptr<int>> row2(5, ip);
+  Row<std::shared_ptr<int>> row3;
+  Row<std::shared_ptr<int>> row4;
+  row3 = row1;
+  row4 = row2;
+  EXPECT_EQ(row3, row4);
+
+  //Not Equal
+  Row<std::shared_ptr<int>> row5(5, std::make_shared<int>(0));
+  Row<std::shared_ptr<int>> row6(5, std::make_shared<int>(0));
+  Row<std::shared_ptr<int>> row7(1);
+  Row<std::shared_ptr<int>> row8(1);
+  row7 = row5;
+  row8 = row6;
   EXPECT_NE(row7, row8);
 }

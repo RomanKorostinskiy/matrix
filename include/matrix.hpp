@@ -82,6 +82,69 @@ template<typename T> class Matrix: private MatrixBuf<T> {
     return !(*this == rhs);
   }
 
+  int rows() const { return rows_; }
+  int cols() const { return cols_; }
+  Matrix& DeleteRow(int row) & {
+    int offset_row = 0;
+    Matrix<T> tmp(rows_ - 1, cols_);
+    for (int i = 0; i < rows_ - 1; i++) {
+      if (i == row)
+        offset_row = 1;
+      for (int j = 0; j < cols_; j++)
+        tmp[i][j] = rows_ptr_[i + offset_row][j];
+    }
+    *this = tmp;
+    return *this;
+  }
+  Matrix& DeleteColumn(int col) & {
+    int offset_col = 0;
+    Matrix<T> tmp(rows_, cols_ - 1);
+    for (int i = 0; i < rows_; i++) {
+      offset_col = 0;
+      for (int j = 0; j < cols_ - 1; j++) {
+        if (j == col)
+          offset_col = 1;
+        tmp[i][j] = rows_ptr_[i][j + offset_col];
+      }
+    }
+    *this = tmp;
+    return *this;
+  }
+  Matrix& DeleteRowColumn(int row, int col) & {
+    int offset_col = 0;
+    int offset_row = 0;
+    Matrix<T> tmp(rows_ - 1, cols_ - 1);
+    for (int i = 0; i < rows_ - 1; i++) {
+      offset_col = 0;
+      if (i == row)
+        offset_row = 1;
+      for (int j = 0; j < cols_ - 1; j++) {
+        if (j == col)
+          offset_col = 1;
+        tmp[i][j] = rows_ptr_[i + offset_row][j + offset_col];
+      }
+    }
+    *this = tmp;
+    return *this;
+  }
+  T RecursiveDet() const {  //TODO: optimize and test this function
+    if (rows_ != cols_)
+      throw std::domain_error(
+          "error: can't calculate the determinant of a non-square matrix");
+    int current_iter = this->rows();
+    T det = 0;
+    if (current_iter == 1) {
+      return rows_ptr_[0][0];
+    }
+    for (int i = 0; i < current_iter; i++) {
+      int sign = - 1 + 2 * (i % 2);
+      Matrix<T> tmp = *this;
+      tmp.DeleteRowColumn(0, i);
+      det += sign * rows_ptr_[0][i] * tmp.RecursiveDet();
+    }
+    return det;
+  }
+
   void Dump() const {
     std::cout << "Matrix " << rows_ << "x" << cols_ << ":" << std::endl;
     for (int i = 0; i < rows_; i++) {
