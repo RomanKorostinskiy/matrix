@@ -1,7 +1,15 @@
 #include "gtest/gtest.h"
 #include "matrix.hpp"
+#include <iostream>
+#include <fstream>
 
 using namespace testing;
+
+std::string GetResourcesPath() {
+  std::string cur_file = __FILE__;
+  std::string cur_dir  = cur_file.substr(0, cur_file.find_last_of('/') + 1);
+  return cur_dir + "/../resources/";
+}
 
 TEST(MatrixOperatorsTests, EqualsTest) {
   //Equal
@@ -103,18 +111,30 @@ TEST(MatrixRAII_Tests, MoveAsignmentTest) {
   EXPECT_NE(m7, m8);
 }
 TEST(MatrixRAII_Tests, SequenceCtorTest) {
-  int m = 5, n = 6;
-  std::vector<int> seq(m * n);
-  for (int i = 0; i < m * n; i++) {
-    seq[i] = i;
+  //Valid construction
+  {
+    int m = 5, n = 6;
+    std::vector<int> seq(m * n);
+    for (int i = 0; i < m * n; i++) {
+      seq[i] = i;
+    }
+    Matrix<int> matrix{m, n, seq.begin(), seq.end()};
+    for (int i = 0, a = 0; i < m; i++) {
+      for (int j = 0; j < n; j++) {
+        EXPECT_EQ(matrix[i][j], seq[a]);
+        a++;
+      }
+    }
   }
 
-  Matrix<int> matrix{m, n, seq.begin(), seq.end()};
-  for (int i = 0, a = 0; i < m; i++) {
-    for (int j = 0; j < n; j++) {
-      EXPECT_EQ(matrix[i][j], seq[a]);
-      a++;
-    }
+  //Invalid construction
+  {
+    int m = 5, n = 6;
+    int sz = m * n + 1;
+    std::vector<int> seq(sz, 0);
+    EXPECT_THROW({
+      Matrix<int> matrix(m, n, seq.begin(), seq.end());
+      }, std::range_error);
   }
 }
 
@@ -199,5 +219,76 @@ TEST(MatrixMethotsTests, DeleteRowColumnTest) {
       EXPECT_EQ(matrix[i][j], seq[a + offset_row]);
       a++;
     }
+  }
+}
+TEST(MatrixMethotsTests, RecursiveDetTestInt) {
+  //Exceptional test
+  {
+    Matrix<int> matrix(5, 7, 0);
+    EXPECT_THROW({
+                   matrix.RecursiveDet();
+                 }, std::domain_error);
+  }
+  //2x2
+  {
+    std::string test_filepath = GetResourcesPath() +
+        "/determinant-tests/det-int2x2.dat";
+    std::ifstream fin(test_filepath);
+    if (!fin.is_open()) {
+      std::cout << "error: can't open file: " << test_filepath;
+      exit(1); //TODO: replace it by exception
+    }
+    int n;
+    fin >> n;
+    std::vector<int> seq(n * n);
+    for (int i = 0; i < n * n; i++) {
+      fin >> seq[i];
+    }
+    int answer;
+    fin >> answer;
+    Matrix<int> matrix(n, n, seq.begin(), seq.end());
+    EXPECT_EQ(matrix.RecursiveDet(), answer);
+    fin.close();
+  }
+  //3x3
+  {
+    std::string test_filepath = GetResourcesPath() +
+        "/determinant-tests/det-int3x3.dat";
+    std::ifstream fin(test_filepath);
+    if (!fin.is_open()) {
+      std::cout << "error: can't open file: " << test_filepath;
+      exit(1); //TODO: replace it by exception
+    }
+    int n;
+    fin >> n;
+    std::vector<int> seq(n * n);
+    for (int i = 0; i < n * n; i++) {
+      fin >> seq[i];
+    }
+    int answer;
+    fin >> answer;
+    Matrix<int> matrix(n, n, seq.begin(), seq.end());
+    EXPECT_EQ(matrix.RecursiveDet(), answer);
+    fin.close();
+  }
+  {
+    std::string test_filepath = GetResourcesPath() +
+        "/determinant-tests/det-int6x6.dat";
+    std::ifstream fin(test_filepath);
+    if (!fin.is_open()) {
+      std::cout << "error: can't open file: " << test_filepath;
+      exit(1); //TODO: replace it by exception
+    }
+    int n;
+    fin >> n;
+    std::vector<int> seq(n * n);
+    for (int i = 0; i < n * n; i++) {
+      fin >> seq[i];
+    }
+    int answer;
+    fin >> answer;
+    Matrix<int> matrix(n, n, seq.begin(), seq.end());
+    EXPECT_EQ(matrix.RecursiveDet(), answer);
+    fin.close();
   }
 }

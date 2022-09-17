@@ -21,7 +21,7 @@ TEST(RowOperatorsTests, EqualsTest) {
   Row<int> row6(5, 1);
   EXPECT_NE(row5, row6);
 }
-TEST(OperatorsTests, SquareBracketsTest) {
+TEST(RowOperatorsTests, SquareBracketsTest) {
   const Row<int> row1(5, 1);
   for (int i = 0; i < 5; i++)
     EXPECT_EQ(row1[i], 1);

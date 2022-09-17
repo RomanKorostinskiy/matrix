@@ -137,7 +137,7 @@ template<typename T> class Matrix: private MatrixBuf<T> {
       return rows_ptr_[0][0];
     }
     for (int i = 0; i < current_iter; i++) {
-      int sign = - 1 + 2 * (i % 2);
+      int sign = 1 - 2 * (i % 2);
       Matrix<T> tmp = *this;
       tmp.DeleteRowColumn(0, i);
       det += sign * rows_ptr_[0][i] * tmp.RecursiveDet();
