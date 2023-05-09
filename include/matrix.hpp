@@ -144,7 +144,7 @@ template<typename T> class Matrix: private MatrixBuf<T> {
     }
     return det;
   }
-  std::vector<std::vector<T>> ToVector() {
+  std::vector<std::vector<T>> ToVector() const {
     std::vector<std::vector<T>> v;
     for (int i = 0; i < rows_; i++) {
         v.push_back(rows_ptr_[i].ToVector());

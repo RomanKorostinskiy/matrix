@@ -65,7 +65,7 @@ template<typename T> class Row: private RowBuf<T> {
     return !(*this == rhs);
   }
 
-  std::vector<T> ToVector() {
+  std::vector<T> ToVector() const {
       std::vector<T> v;
       for (int i = 0; i < cols_; i++) {
           v.push_back(data_[i]);
