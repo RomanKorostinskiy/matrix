@@ -35,18 +35,18 @@ template<typename T> class Row: private RowBuf<T> {
   using RowBuf<T>::data_;
 
  public:
-  Row(int cols = 0, T val = T{}): RowBuf<T>(cols, val) {}
+  explicit Row(int cols = 0, T val = T{}): RowBuf<T>(cols, val) {}
   Row(const Row &rhs): RowBuf<T>(rhs.cols_) {
     for (int i = 0; i < cols_; i++)
       data_[i] = rhs.data_[i];
   }
-  Row(Row &&rhs) = default;
+  Row(Row &&rhs) noexcept = default;
   Row& operator=(const Row &rhs) {
     Row tmp(rhs);
     std::swap(*this, tmp);
     return *this;
   }
-  Row& operator=(Row &&rhs) = default;
+  Row& operator=(Row &&rhs) noexcept = default;
   ~Row() = default;
 
   T& operator[](int n) {return data_[n];}

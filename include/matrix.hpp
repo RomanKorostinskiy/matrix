@@ -41,7 +41,7 @@ template<typename T> class Matrix: private MatrixBuf<T> {
   using MatrixBuf<T>::rows_ptr_;
 
  public:
-  Matrix(int rows = 0, int cols = 0, T val = T{})
+  explicit Matrix(int rows = 0, int cols = 0, T val = T{})
       : MatrixBuf<T>(rows, cols, val) {}
   template <typename It> Matrix(int rows, int cols, It start, It fin)
       : MatrixBuf<T>(rows, cols) {
@@ -57,13 +57,13 @@ template<typename T> class Matrix: private MatrixBuf<T> {
     for (int i = 0; i < rows_; i++)
       rows_ptr_[i] = rhs.rows_ptr_[i];
   }
-  Matrix(Matrix &&rhs) = default;
+  Matrix(Matrix &&rhs) noexcept = default;
   Matrix& operator=(const Matrix &rhs) {
     Matrix tmp(rhs);
     std::swap(*this, tmp);
     return *this;
   }
-  Matrix& operator=(Matrix &&rhs) = default;
+  Matrix& operator=(Matrix &&rhs) noexcept = default;
   ~Matrix() = default;
 
   Row<T>& operator[](int n) {return rows_ptr_[n];}
