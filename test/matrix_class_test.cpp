@@ -159,7 +159,7 @@ TEST(MatrixRAII_TemplateTest, CopyAssignmentTest) {
   EXPECT_NE(m7, m8);
 }
 
-TEST(MatrixMethotsTests, DeleteRowTest) {
+TEST(MatrixMethodsTests, DeleteRowTest) {
   int m = 5, n = 6;
   std::vector<int> seq(m * n);
   for (int i = 0; i < m * n; i++) {
@@ -179,7 +179,7 @@ TEST(MatrixMethotsTests, DeleteRowTest) {
     }
   }
 }
-TEST(MatrixMethotsTests, DeleteColumnTest) {
+TEST(MatrixMethodsTests, DeleteColumnTest) {
   int m = 5, n = 6;
   std::vector<int> seq(m * n);
   for (int i = 0; i < m * n; i++) {
@@ -198,7 +198,7 @@ TEST(MatrixMethotsTests, DeleteColumnTest) {
     }
   }
 }
-TEST(MatrixMethotsTests, DeleteRowColumnTest) {
+TEST(MatrixMethodsTests, DeleteRowColumnTest) {
   int m = 5, n = 6;
   std::vector<int> seq(m * n);
   for (int i = 0; i < m * n; i++) {
@@ -221,7 +221,7 @@ TEST(MatrixMethotsTests, DeleteRowColumnTest) {
     }
   }
 }
-TEST(MatrixMethotsTests, RecursiveDetTestInt) {
+TEST(MatrixMethodsTests, RecursiveDetTestInt) {
   //Exceptional test
   {
     Matrix<int> matrix(5, 7, 0);
@@ -291,4 +291,23 @@ TEST(MatrixMethotsTests, RecursiveDetTestInt) {
     EXPECT_EQ(matrix.RecursiveDet(), answer);
     fin.close();
   }
+}
+TEST(MatrixMethodsTests, ToVectorTest) {
+  int m = 5, n = 6;
+
+  std::vector<std::vector<int>> v(m, std::vector<int>(n, 0));
+  for (int i = 0; i < m; i++) {
+    for (int j = 0; j < n; j++)
+      v[i][j] = i;
+  }
+
+  Matrix<int> matrix(m, n);
+  for (int i = 0; i < m; i++) {
+    for (int j = 0; j < n; j++)
+      matrix[i][j] = i;
+  }
+
+  std::vector<std::vector<int>> v2 = matrix.ToVector();
+
+  EXPECT_EQ(v, v2);
 }

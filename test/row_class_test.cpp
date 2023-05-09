@@ -99,7 +99,6 @@ TEST(RowRAII_Tests, MoveAsignmentTest) {
   row8 = Row<int> (5, 1);
   EXPECT_NE(row7, row8);
 }
-
 TEST(RowRAII_TemplateTest, CopyAssignmentTest) {
   //Equal
   std::shared_ptr<int> ip = std::make_shared<int>(0);
@@ -119,4 +118,11 @@ TEST(RowRAII_TemplateTest, CopyAssignmentTest) {
   row7 = row5;
   row8 = row6;
   EXPECT_NE(row7, row8);
+}
+TEST(RowMethodsTest, ToVectorTest) {
+    //Equal
+    std::vector<int> v = {0, 0, 0, 0};
+    Row<int> r(4);
+    std::vector<int> v2 = r.ToVector();
+    EXPECT_EQ(v, v2);
 }
